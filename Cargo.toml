@@ -1,0 +1,9 @@
+[package]
+name = "rust-mysql-redis-client-usage"
+version = "0.1.0"
+authors = ["dekokun <dekokun@hatena.ne.jp>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
