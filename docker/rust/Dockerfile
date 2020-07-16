@@ -1,14 +1,14 @@
 FROM rust:1.44.1
 
+RUN mkdir -p /work
+WORKDIR /work
 # for cache
 COPY Cargo.toml Cargo.lock ./
-RUN mkdir -p /src
-WORKDIR /src
-RUN echo "fn main() {println!(\"broken\")}" > /src/main.rs \
+RUN mkdir -p src/
+RUN echo "fn main() {println!(\"broken\")}" > src/main.rs \
     && cargo build --release
 
-COPY . .
+COPY ./src/ ./src/
 RUN cargo build --release
-RUN cargo install --path .
 
-CMD ["/usr/local/cargo/bin/rust-mysql-redis-client-usage"]
+CMD ["/work/target/release/rust-mysql-redis-client-usage"]
