@@ -25,7 +25,7 @@ services:
         "wait-for-it",
         "db:3306",
         "-t",
-        "15",
+        "30",
         "--",
         "/work/target/release/rust-mysql-redis-client-usage",
       ]
