@@ -12,21 +12,3 @@ services:
     volumes:
       - ./docker/mysql:/var/lib/mysql
     container_name: mysql
-  rust:
-    build:
-      context: .
-      dockerfile: ./docker/rust/Dockerfile
-    environment:
-      USER: root
-    depends_on:
-      - db
-    command:
-      [
-        "wait-for-it",
-        "db:3306",
-        "-t",
-        "30",
-        "--",
-        "/work/target/release/rust-mysql-redis-client-usage",
-      ]
-    container_name: rust

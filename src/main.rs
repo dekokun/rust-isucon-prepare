@@ -14,7 +14,7 @@ fn main() {
 }
 
 fn mysql() -> std::result::Result<String, error::Error> {
-    let url = "mysql://isucon:isucon@db:3306/isucon";
+    let url = "mysql://isucon:isucon@localhost:3306/isucon";
 
     let pool = Pool::new(url)?;
 
