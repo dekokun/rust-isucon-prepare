@@ -1,6 +1,3 @@
-use mysql::prelude::*;
-use mysql::*;
-
 #[derive(Debug, PartialEq, Eq)]
 struct Payment {
     customer_id: i32,
@@ -8,12 +5,34 @@ struct Payment {
     account_name: Option<String>,
 }
 
-fn main() {
+#[async_std::main]
+async fn main() -> Result<(), sqlx::Error> {
     let ret = mysql();
-    println!("{:?}", ret)
+    println!("{:?}", ret);
+    let ret = sqlx().await;
+
+    println!("{:?}", ret);
+    Ok(())
 }
 
-fn mysql() -> std::result::Result<String, error::Error> {
+async fn sqlx() -> Result<(), sqlx::Error> {
+    use sqlx::prelude::*;
+    use sqlx::*;
+    let mut conn = MySqlConnection::connect("mysql://isucon:isucon@localhost:3306/isucon").await?;
+
+    let row: (i64,) = sqlx::query_as("SELECT ?")
+        .bind(150_i64)
+        .fetch_one(&mut conn)
+        .await?;
+
+    assert_eq!(row.0, 150);
+
+    Ok(())
+}
+
+fn mysql() -> std::result::Result<String, mysql::error::Error> {
+    use mysql::prelude::*;
+    use mysql::*;
     let url = "mysql://isucon:isucon@localhost:3306/isucon";
 
     let pool = Pool::new(url)?;
