@@ -12,6 +12,11 @@ services:
     volumes:
       - ./docker/mysql:/var/lib/mysql
     container_name: mysql
+  redis:
+    image: redis:6.0.5
+    ports:
+      - 6379:6379
+    container_name: redis
   rust:
     build:
       context: .
