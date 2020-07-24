@@ -10,6 +10,6 @@ up:
 .PHONE: down
 down:
 	docker-compose down
-.PHONE: down
+.PHONE: run
 run:
 	cargo run
