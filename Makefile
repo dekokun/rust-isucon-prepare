@@ -1,15 +1,15 @@
 .PHONY: clean
 clean:
 	rm -rf docker/mysql
-.PHONE: build
+.PHONY: build
 build:
 	cargo build
-.PHONE: up
+.PHONY: up
 up:
 	docker-compose up
-.PHONE: down
+.PHONY: down
 down:
 	docker-compose down
-.PHONE: run
+.PHONY: run
 run:
 	cargo run
