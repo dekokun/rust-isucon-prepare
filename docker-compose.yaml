@@ -17,21 +17,3 @@ services:
     ports:
       - 6379:6379
     container_name: redis
-  rust:
-    build:
-      context: .
-      dockerfile: ./docker/rust/Dockerfile
-    environment:
-      USER: root
-    depends_on:
-      - db
-    command:
-      [
-        "wait-for-it",
-        "db:3306",
-        "-t",
-        "30",
-        "--",
-        "/work/target/release/rust-mysql-redis-client-usage",
-      ]
-    container_name: rust

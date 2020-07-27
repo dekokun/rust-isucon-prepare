@@ -1,6 +1,3 @@
-use mysql::prelude::*;
-use mysql::*;
-
 #[derive(Debug, PartialEq, Eq)]
 struct Payment {
     customer_id: i32,
@@ -8,13 +5,44 @@ struct Payment {
     account_name: Option<String>,
 }
 
-fn main() {
+#[async_std::main]
+async fn main() -> Result<(), sqlx::Error> {
     let ret = mysql();
-    println!("{:?}", ret)
+    println!("{:?}", ret);
+    let ret = sqlx().await;
+
+    println!("{:?}", ret);
+    Ok(())
 }
 
-fn mysql() -> std::result::Result<String, error::Error> {
-    let url = "mysql://isucon:isucon@db:3306/isucon";
+fn print_typename<T>(_: T) {
+    println!("{}", std::any::type_name::<T>());
+}
+
+async fn sqlx() -> Result<(), sqlx::Error> {
+    use sqlx::prelude::*;
+    use sqlx::*;
+    let mut conn = MySqlConnection::connect("mysql://isucon:isucon@localhost:3306/isucon").await?;
+    let _insert_count = sqlx::query!("INSERT INTO payment (customer_id, amount, account_name) VALUES (1, 1, 'hoge1'), (2, 2, null), (3, 3, null)").execute(&mut conn).await?;
+    let fetch_all_rows = sqlx::query!("SELECT * from payment where customer_id = ?", 1)
+        .fetch_all(&mut conn)
+        .await?;
+
+    assert_eq!(fetch_all_rows[0].customer_id, 1);
+    assert_eq!(fetch_all_rows[0].amount, 1);
+    assert_eq!(fetch_all_rows[0].account_name.as_ref().unwrap(), "hoge1");
+
+    let fetch_one_row = sqlx::query!("SELECT * from payment where customer_id = ?", 1)
+        .fetch_one(&mut conn)
+        .await?;
+    assert_eq!(fetch_all_rows[0].amount, fetch_one_row.amount);
+    Ok(())
+}
+
+fn mysql() -> std::result::Result<String, mysql::error::Error> {
+    use mysql::prelude::*;
+    use mysql::*;
+    let url = "mysql://isucon:isucon@localhost:3306/isucon";
 
     let pool = Pool::new(url)?;
 
