@@ -10,6 +10,12 @@ pub fn redis() -> redis::RedisResult<()> {
     let count: i32 = con.get("my_key").unwrap_or(0);
     assert_eq!(count, 0);
 
-    // use redis sorted set
+    con.zadd("rank", "1deko", 1)?;
+    con.zadd("rank", "2deko", 2)?;
+    con.zadd("rank", "3deko", 2)?;
+    let count: i32 = con.zcard("rank")?;
+    assert_eq!(count, 3);
+    let rank: i32 = con.zrank("rank", "2deko")?;
+    assert_eq!(rank + 1, 2);
     Ok(())
 }
