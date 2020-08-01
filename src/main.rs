@@ -18,6 +18,7 @@ async fn main() -> Result<(), sqlx::Error> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn print_typename<T>(_: T) {
     println!("{}", std::any::type_name::<T>());
 }
