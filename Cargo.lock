@@ -1259,6 +1259,7 @@ name = "rust-mysql-redis-client-usage"
 version = "0.1.0"
 dependencies = [
  "async-std",
+ "lazy_static",
  "mysql",
  "redis",
  "sqlx",
