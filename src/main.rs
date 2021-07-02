@@ -17,8 +17,7 @@ lazy_static! {
 
 #[async_std::main]
 async fn main() {
-
-    println!("{}", HASHMAP.get(&0).unwrap())
+    println!("{}", HASHMAP.get(&0).unwrap());
 
     let ret = mysql_sample::mysql().expect("failed mysql crate sample");
     println!("{:?}", ret);
