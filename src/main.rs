@@ -21,15 +21,24 @@ use std::sync::Mutex;
 struct AppStateWithCounter {
     counter: Mutex<i32>, // <- Mutex is necessary to mutate safely across threads
 }
+struct AppStateWithCounter2 {
+    counter: Mutex<i32>, // <- Mutex is necessary to mutate safely across threads
+}
 
 #[get("/{id}/{name}")]
 async fn index(
     web::Path((id, name)): web::Path<(u32, String)>,
     data: web::Data<AppStateWithCounter>,
+    data2: web::Data<AppStateWithCounter2>,
 ) -> impl Responder {
     let mut counter = data.counter.lock().unwrap(); // <- get counter's MutexGuard
     *counter += 1; // <- access counter inside MutexGuard
-    format!("Hello {}! id:{}\nRequest number: {}", name, id, counter)
+    let mut counter2 = data2.counter.lock().unwrap(); // <- get counter's MutexGuard
+    *counter2 += 2; // <- access counter inside MutexGuard
+    format!(
+        "Hello {}! id:{}\nRequest number: {}, number2: {}",
+        name, id, counter, counter2
+    )
 }
 
 #[actix_web::main]
@@ -37,12 +46,20 @@ async fn main() -> std::io::Result<()> {
     let counter = web::Data::new(AppStateWithCounter {
         counter: Mutex::new(0),
     });
+    let counter2 = web::Data::new(AppStateWithCounter2 {
+        counter: Mutex::new(0),
+    });
     test().await;
-    HttpServer::new(move || App::new().app_data(counter.clone()).service(index))
-        .workers(10)
-        .bind("127.0.0.1:8080")?
-        .run()
-        .await
+    HttpServer::new(move || {
+        App::new()
+            .app_data(counter.clone())
+            .app_data(counter2.clone())
+            .service(index)
+    })
+    .workers(10)
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
 }
 
 async fn test() {
