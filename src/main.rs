@@ -21,6 +21,7 @@ use std::sync::Mutex;
 struct AppStateWithCounter {
     counter: Mutex<i32>, // <- Mutex is necessary to mutate safely across threads
 }
+// appのdataは型で判別してる(同じ型だと同じ値がはいってくる)ので型を分ける必要がある
 struct AppStateWithCounter2 {
     counter: Mutex<i32>, // <- Mutex is necessary to mutate safely across threads
 }
