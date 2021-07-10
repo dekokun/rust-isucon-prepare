@@ -16,17 +16,17 @@ lazy_static! {
 }
 
 use actix_web::{get, web, App, HttpServer, Responder};
-use std::sync::Mutex;
+use async_std::sync::RwLock;
 
 struct StateTest {
     counter: i32,
 }
 struct AppStateWithCounter {
-    counter: Mutex<StateTest>, // <- Mutex is necessary to mutate safely across threads
+    counter: RwLock<StateTest>, // <- Mutex is necessary to mutate safely across threads
 }
 // appのdataは型で判別してる(同じ型だと同じ値がはいってくる)ので型を分ける必要がある
 struct AppStateWithCounter2 {
-    counter: Mutex<i32>, // <- Mutex is necessary to mutate safely across threads
+    counter: RwLock<i32>, // <- Mutex is necessary to mutate safely across threads
 }
 
 #[get("/{id}/{name}")]
@@ -35,11 +35,11 @@ async fn index(
     data: web::Data<AppStateWithCounter>,
     data2: web::Data<AppStateWithCounter2>,
 ) -> impl Responder {
-    let mut counter = data.counter.lock().unwrap(); // <- get counter's MutexGuard
+    let mut counter = data.counter.write().await; // <- get counter's MutexGuard
     *counter = StateTest {
         counter: counter.counter + 1,
     }; // <- access counter inside MutexGuard
-    let mut counter2 = data2.counter.lock().unwrap(); // <- get counter's MutexGuard
+    let mut counter2 = data2.counter.write().await; // <- get counter's MutexGuard
     *counter2 += 2; // <- access counter inside MutexGuard
     format!(
         "Hello {}! id:{}\nRequest number: {}, number2: {}",
@@ -50,10 +50,10 @@ async fn index(
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let counter = web::Data::new(AppStateWithCounter {
-        counter: Mutex::new(StateTest { counter: 0 }),
+        counter: RwLock::new(StateTest { counter: 0 }),
     });
     let counter2 = web::Data::new(AppStateWithCounter2 {
-        counter: Mutex::new(0),
+        counter: RwLock::new(0),
     });
     test().await;
     HttpServer::new(move || {
